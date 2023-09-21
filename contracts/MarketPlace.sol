@@ -2,16 +2,16 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "./IMynFT.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract NFTMarketplace is Ownable {
     IERC20 public trikonToken;
-    IERC721 public nft;
+    IMyNFT public nft;
 
     constructor(address _trikonToken, address _nft) {
         trikonToken = IERC20(_trikonToken);
-        nft = IERC721(_nft);
+        nft = IMyNFT(_nft);
     }
 
     struct Listing {
@@ -26,6 +26,10 @@ contract NFTMarketplace is Ownable {
     event NFTListed(uint256 indexed tokenId, uint256 price, address indexed seller);
     event NFTSold(uint256 indexed tokenId, uint256 price, address indexed buyer, address indexed seller);
 
+     function mintNFT(address to, string memory tokenId) external onlyOwner {
+        nft.mintNFT(to, tokenId);
+    }
+    
     function listNFTForSell(uint256 tokenId, uint256 price) external {
         require(nft.ownerOf(tokenId) == msg.sender, "You don't own this NFT");
         require(!listings[tokenId].active, "NFT is already listed");
